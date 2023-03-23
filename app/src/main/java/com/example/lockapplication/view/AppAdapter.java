@@ -1,5 +1,6 @@
 package com.example.lockapplication.view;
 
+import android.content.pm.ApplicationInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,12 @@ import com.example.lockapplication.R;
 import com.google.android.material.materialswitch.MaterialSwitch;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AppAdapter extends RecyclerView.Adapter<AppAdapter.MyAppViewModel> {
 
     ArrayList<AppItemList> arrayList;
+
 
     public AppAdapter(ArrayList<AppItemList> arrayList) {
         this.arrayList = arrayList;
@@ -31,7 +34,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.MyAppViewModel> 
     @Override
     public void onBindViewHolder(@NonNull MyAppViewModel holder, int position) {
         AppItemList appItemList = arrayList.get(position);
-        holder.imageView.setImageResource(appItemList.getImageId());
+        holder.imageView.setImageDrawable(appItemList.getImageId());
         holder.textView.setText(appItemList.getAppName());
         holder.aSwitch.setChecked(appItemList.isStatus());
     }

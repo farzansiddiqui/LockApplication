@@ -1,11 +1,13 @@
 package com.example.lockapplication.view;
 
+import android.graphics.drawable.Drawable;
+
 public class AppItemList {
-    public int imageId;
+    public Drawable imageId;
     public String appName;
     public boolean status;
 
-    public AppItemList(int imageId, String appName, boolean status) {
+    public AppItemList(Drawable imageId, String appName, boolean status) {
         this.imageId = imageId;
         this.appName = appName;
         this.status = status;
@@ -19,7 +21,7 @@ public class AppItemList {
         return status;
     }
 
-    public int getImageId() {
+    public Drawable getImageId() {
         return imageId;
     }
 }
