@@ -1,23 +1,21 @@
 package com.example.lockapplication.view;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup;
 
-import com.example.lockapplication.R;
 import com.example.lockapplication.databinding.ActivityMainBinding;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,8 +24,8 @@ public class MainActivity extends AppCompatActivity {
         AppAdapter adapter;
         PackageManager packageManager;
         List<ApplicationInfo> list;
+        CircularProgressIndicator circularProgressIndicator;
 
-    @SuppressLint("QueryPermissionsNeeded")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,18 +36,20 @@ public class MainActivity extends AppCompatActivity {
         packageManager = getPackageManager();
         list = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
 
+
     List<PackageInfo> packageInfos = getPackageManager().getInstalledPackages(0);
 
         packageInfos.sort((o1, o2) -> o1.applicationInfo.loadLabel(getPackageManager()).toString().
                 compareToIgnoreCase(o2.applicationInfo.loadLabel(getPackageManager()).toString()));
 
+
         for (int i = 0; i < packageInfos.size(); i++) {
             PackageInfo packageInfo = packageInfos.get(i);
-            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0){
+            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
                     String appName = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
                     Drawable icon = packageInfo.applicationInfo.loadIcon(packageManager);
                     arrayList.add(new AppItemList(icon, appName,false));
-                Log.d("TAG", "onCreate: "+appName);
+                    Log.d("TAG", "onCreate: "+appName);
             }
 
         }
@@ -57,4 +57,6 @@ public class MainActivity extends AppCompatActivity {
         adapter = new AppAdapter(arrayList);
         binding.recyclerView.setAdapter(adapter);
     }
+
+
 }
