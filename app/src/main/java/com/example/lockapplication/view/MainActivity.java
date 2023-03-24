@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,6 +16,8 @@ import com.example.lockapplication.R;
 import com.example.lockapplication.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,19 +37,23 @@ public class MainActivity extends AppCompatActivity {
         arrayList = new ArrayList<>();
         packageManager = getPackageManager();
         list = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-        for(ApplicationInfo app : list) {
-            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 0 && !app.sourceDir.startsWith("/system/app") && !app.sourceDir.startsWith("/system/priv-app")){
-                String name = packageManager.getApplicationLabel(app).toString();
-                Log.d("TAG", "onCreate: "+name);
-                Drawable icon  = app.loadIcon(packageManager);
-                Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
-                if (intent != null){
-                    arrayList.add(new AppItemList(icon, name,false));
-                }
 
+    List<PackageInfo> packageInfos = getPackageManager().getInstalledPackages(0);
+
+        packageInfos.sort((o1, o2) -> o1.applicationInfo.loadLabel(getPackageManager()).toString().
+                compareToIgnoreCase(o2.applicationInfo.loadLabel(getPackageManager()).toString()));
+
+        for (int i = 0; i < packageInfos.size(); i++) {
+            PackageInfo packageInfo = packageInfos.get(i);
+            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0){
+                    String appName = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
+                    Drawable icon = packageInfo.applicationInfo.loadIcon(packageManager);
+                    arrayList.add(new AppItemList(icon, appName,false));
+                Log.d("TAG", "onCreate: "+appName);
             }
 
         }
+
         adapter = new AppAdapter(arrayList);
         binding.recyclerView.setAdapter(adapter);
     }

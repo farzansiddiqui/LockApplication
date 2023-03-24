@@ -55,4 +55,5 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.MyAppViewModel> 
             aSwitch = itemView.findViewById(R.id.switchMaterial);
         }
     }
+
 }
