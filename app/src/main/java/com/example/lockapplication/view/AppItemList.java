@@ -24,4 +24,7 @@ public class AppItemList {
     public Drawable getImageId() {
         return imageId;
     }
+    public  void isUpdated(){
+
+    }
 }

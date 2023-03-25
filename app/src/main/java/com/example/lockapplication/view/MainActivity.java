@@ -9,8 +9,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.ViewGroup;
+
+
 
 import com.example.lockapplication.databinding.ActivityMainBinding;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
@@ -36,11 +36,14 @@ public class MainActivity extends AppCompatActivity {
         packageManager = getPackageManager();
         list = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
 
+       showCircleProgress();
+
 
     List<PackageInfo> packageInfos = getPackageManager().getInstalledPackages(0);
 
         packageInfos.sort((o1, o2) -> o1.applicationInfo.loadLabel(getPackageManager()).toString().
                 compareToIgnoreCase(o2.applicationInfo.loadLabel(getPackageManager()).toString()));
+
 
 
         for (int i = 0; i < packageInfos.size(); i++) {
@@ -49,14 +52,27 @@ public class MainActivity extends AppCompatActivity {
                     String appName = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
                     Drawable icon = packageInfo.applicationInfo.loadIcon(packageManager);
                     arrayList.add(new AppItemList(icon, appName,false));
-                    Log.d("TAG", "onCreate: "+appName);
+
             }
 
         }
-
         adapter = new AppAdapter(arrayList);
         binding.recyclerView.setAdapter(adapter);
-    }
 
+    }
+public void showCircleProgress(){
+    circularProgressIndicator = new CircularProgressIndicator(this);
+    ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams
+            (ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT);
+    layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+    layoutParams.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
+    layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+    layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+    circularProgressIndicator.setLayoutParams(layoutParams);
+    binding.mainLayout.addView(circularProgressIndicator);
+    circularProgressIndicator.setIndeterminate(true);
+    circularProgressIndicator.show();
+}
 
 }
