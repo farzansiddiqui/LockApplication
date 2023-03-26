@@ -9,7 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
+import android.widget.Toast;
 
 
 import com.example.lockapplication.databinding.ActivityMainBinding;
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         packageManager = getPackageManager();
         list = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
 
-       showCircleProgress();
 
 
     List<PackageInfo> packageInfos = getPackageManager().getInstalledPackages(0);
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-        adapter = new AppAdapter(arrayList);
+        adapter = new AppAdapter(this,arrayList);
         binding.recyclerView.setAdapter(adapter);
 
     }
@@ -74,5 +73,6 @@ public void showCircleProgress(){
     circularProgressIndicator.setIndeterminate(true);
     circularProgressIndicator.show();
 }
+
 
 }

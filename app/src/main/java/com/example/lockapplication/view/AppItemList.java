@@ -6,6 +6,7 @@ public class AppItemList {
     public Drawable imageId;
     public String appName;
     public boolean status;
+    public boolean listShow;
 
     public AppItemList(Drawable imageId, String appName, boolean status) {
         this.imageId = imageId;
@@ -24,7 +25,12 @@ public class AppItemList {
     public Drawable getImageId() {
         return imageId;
     }
-    public  void isUpdated(){
 
+    public boolean isListShow() {
+        return listShow;
+    }
+
+    public void setListShow(boolean listShow) {
+        this.listShow = listShow;
     }
 }
