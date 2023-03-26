@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/md_theme_light_onPrimary" />
+                </shape>
+            </item>
+            <item android:width="256dp" android:height="256dp" android:gravity="center">
+                <bitmap android:src="@drawable/logo_app" />
+            </item>
+        </layer-list>
+    </item>
+
+</selector>
