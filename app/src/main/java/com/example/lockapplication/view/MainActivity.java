@@ -25,15 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-        ActivityMainBinding binding;
-        ArrayList<AppItemList> arrayList;
-        AppAdapter adapter;
-        PackageManager packageManager;
-        List<ApplicationInfo> list;
-        CircularProgressIndicator circularProgressIndicator;
+    ActivityMainBinding binding;
+    ArrayList<AppItemList> arrayList;
+    AppAdapter adapter;
+    PackageManager packageManager;
+    List<ApplicationInfo> list;
+    CircularProgressIndicator circularProgressIndicator;
     private DevicePolicyManager policyManager;
     private ComponentName componentName;
     private static final int REQUEST_CODE_ENABLE_ADMIN = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +48,18 @@ public class MainActivity extends AppCompatActivity {
 
         policyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         componentName = new ComponentName(this, MyDeviceAdminReceiver.class);
+        policyManager.setPackagesSuspended(componentName, new String[]{getPackageName()}, true);
+        if (!policyManager.isAdminActive(componentName)){
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Enable app lock");
+            startActivityForResult(intent, 1234);
 
+        }
+
+
+        policyManager.setLockTaskPackages(componentName, new String[]{getPackageName()});
+        startLockTask();
 
         List<PackageInfo> packageInfos = getPackageManager().getInstalledPackages(0);
 
@@ -55,62 +67,62 @@ public class MainActivity extends AppCompatActivity {
                 compareToIgnoreCase(o2.applicationInfo.loadLabel(getPackageManager()).toString()));
 
 
-
         for (int i = 0; i < packageInfos.size(); i++) {
             PackageInfo packageInfo = packageInfos.get(i);
             if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-                    String appName = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
-                    Drawable icon = packageInfo.applicationInfo.loadIcon(packageManager);
-                    arrayList.add(new AppItemList(icon, appName,false));
+                String appName = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
+                Drawable icon = packageInfo.applicationInfo.loadIcon(packageManager);
+                arrayList.add(new AppItemList(icon, appName, false));
 
             }
 
         }
         adapter = new AppAdapter(this, arrayList, (position, checked) -> {
-            if (checked){
-                Toast.makeText(MainActivity.this, "Turn On"+position, Toast.LENGTH_SHORT).show();
-            }else {
-                Toast.makeText(MainActivity.this, "Turn Off"+position, Toast.LENGTH_SHORT).show();
+            if (checked) {
+                Toast.makeText(MainActivity.this, "Turn On" + position, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Turn Off" + position, Toast.LENGTH_SHORT).show();
             }
         });
         binding.recyclerView.setAdapter(adapter);
 
     }
-public void showCircleProgress(){
-    circularProgressIndicator = new CircularProgressIndicator(this);
-    ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams
-            (ConstraintLayout.LayoutParams.WRAP_CONTENT,
-            ConstraintLayout.LayoutParams.WRAP_CONTENT);
-    layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
-    layoutParams.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
-    layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
-    layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-    circularProgressIndicator.setLayoutParams(layoutParams);
-    binding.mainLayout.addView(circularProgressIndicator);
-    circularProgressIndicator.setIndeterminate(true);
-    circularProgressIndicator.show();
-}
+
+    public void showCircleProgress() {
+        circularProgressIndicator = new CircularProgressIndicator(this);
+        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams
+                (ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        circularProgressIndicator.setLayoutParams(layoutParams);
+        binding.mainLayout.addView(circularProgressIndicator);
+        circularProgressIndicator.setIndeterminate(true);
+        circularProgressIndicator.show();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_ENABLE_ADMIN){
-            if (resultCode == RESULT_OK){
+        if (requestCode == REQUEST_CODE_ENABLE_ADMIN) {
+            if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "Device Admin Enabled", Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 Toast.makeText(this, "Device Admin Not Enabled", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     public void lockApplication() throws PackageManager.NameNotFoundException {
-    String packageName = String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0));
-    Bundle appBundle = new Bundle();
-    appBundle.putBoolean(getPackageName(), true);
-    policyManager.setApplicationRestrictions(componentName, packageName, appBundle);
+        String packageName = String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0));
+        Bundle appBundle = new Bundle();
+        appBundle.putBoolean(getPackageName(), true);
+        policyManager.setApplicationRestrictions(componentName, packageName, appBundle);
 
 
-}
+    }
 
 
 }

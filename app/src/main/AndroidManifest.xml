@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
+    <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_ADMINS"/>
+
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -34,7 +37,8 @@
         </activity>
         <activity
             android:name=".view.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:lockTaskMode="if_whitelisted">
 
         </activity>
 
