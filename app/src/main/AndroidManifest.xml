@@ -4,9 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
-    <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN"/>
-    <uses-permission android:name="android.permission.MANAGE_DEVICE_ADMINS"/>
+
+    <!--  <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN"/>
+      <uses-permission android:name="android.permission.MANAGE_DEVICE_ADMINS"/>-->
 
     <queries>
         <intent>
@@ -37,11 +39,11 @@
         </activity>
         <activity
             android:name=".view.MainActivity"
-            android:exported="true"
-            android:lockTaskMode="if_whitelisted">
+            android:exported="true">
 
         </activity>
 
+       <!--  Static BroadCast Receiver-->
 
         <receiver
             android:name=".broadcastReceiver.MyDeviceAdminReceiver"
@@ -54,6 +56,8 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
+        
+
 
     </application>
 

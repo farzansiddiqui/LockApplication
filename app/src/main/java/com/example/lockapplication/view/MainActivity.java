@@ -1,65 +1,83 @@
 package com.example.lockapplication.view;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
+import android.app.KeyguardManager;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+
+import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
 
-import com.example.lockapplication.broadcastReceiver.MyDeviceAdminReceiver;
+
 import com.example.lockapplication.databinding.ActivityMainBinding;
+import com.example.lockapplication.thread.ActivityLockTask;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
     ActivityMainBinding binding;
     ArrayList<AppItemList> arrayList;
     AppAdapter adapter;
     PackageManager packageManager;
     List<ApplicationInfo> list;
     CircularProgressIndicator circularProgressIndicator;
-    private DevicePolicyManager policyManager;
-    private ComponentName componentName;
     private static final int REQUEST_CODE_ENABLE_ADMIN = 1;
+    ActivityLockTask activityLockTask;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+
         setContentView(binding.getRoot());
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         arrayList = new ArrayList<>();
         packageManager = getPackageManager();
         list = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+        activityLockTask = new ActivityLockTask();
 
+        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+        FingerprintManager fingerprintManager = (FingerprintManager) getSystemService(FINGERPRINT_SERVICE);
+        // Check if the device has a secure lock screen
+        if (keyguardManager.isKeyguardSecure()) {
 
-        policyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-        componentName = new ComponentName(this, MyDeviceAdminReceiver.class);
-        policyManager.setPackagesSuspended(componentName, new String[]{getPackageName()}, true);
-        if (!policyManager.isAdminActive(componentName)){
-            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
-            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Enable app lock");
-            startActivityForResult(intent, 1234);
+            // Create a new KeyguardManager.KeyguardLock instance
+            KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("MyAppLock");
 
+            // Disable the keyguard to allow us to show the PIN prompt
+            keyguardLock.disableKeyguard();
+
+            // Prompt the user to enter their PIN
+            Intent intent = keyguardManager.createConfirmDeviceCredentialIntent("Enter PIN to unlock", "Please enter your PIN to unlock the app");
+            startActivityForResult(intent, REQUEST_CODE_ENABLE_ADMIN);
+
+            // Re-enable the keyguard when the activity is resumed
+            onResume(); {
+                super.onResume();
+                keyguardLock.reenableKeyguard();
+            }
+
+        } else {
+            // Device does not have a secure lock screen
+            Toast.makeText(this, "Device does not have a secure lock screen", Toast.LENGTH_LONG).show();
         }
 
 
-        policyManager.setLockTaskPackages(componentName, new String[]{getPackageName()});
-        startLockTask();
 
         List<PackageInfo> packageInfos = getPackageManager().getInstalledPackages(0);
 
@@ -79,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         }
         adapter = new AppAdapter(this, arrayList, (position, checked) -> {
             if (checked) {
+
+              /*  Intent intent = new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
+                startActivity(intent);*/
                 Toast.makeText(MainActivity.this, "Turn On" + position, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(MainActivity.this, "Turn Off" + position, Toast.LENGTH_SHORT).show();
@@ -115,13 +136,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void lockApplication() throws PackageManager.NameNotFoundException {
-        String packageName = String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0));
-        Bundle appBundle = new Bundle();
-        appBundle.putBoolean(getPackageName(), true);
-        policyManager.setApplicationRestrictions(componentName, packageName, appBundle);
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        activityLockTask.deactivateLockTask();
     }
 
 
